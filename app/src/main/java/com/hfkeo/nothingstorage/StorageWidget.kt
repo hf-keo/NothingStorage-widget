@@ -29,13 +29,16 @@ class StorageWidget : AppWidgetProvider() {
         fun refreshAll(context: Context) {
             val manager = AppWidgetManager.getInstance(context)
             manager.getAppWidgetIds(ComponentName(context, StorageWidget::class.java)).forEach {
-                update(context, manager, it)
+                update(context, manager, it, false)
+            }
+            manager.getAppWidgetIds(ComponentName(context, StorageCompactWidget::class.java)).forEach {
+                update(context, manager, it, true)
             }
         }
         private fun format(bytes: Long): String =
             String.format(Locale.getDefault(), "%.1f GB", bytes / 1_000_000_000.0)
 
-        fun update(context: Context, manager: AppWidgetManager, id: Int) {
+        fun update(context: Context, manager: AppWidgetManager, id: Int, compact: Boolean = false) {
             val stats = StatFs(Environment.getDataDirectory().absolutePath)
             val total = stats.totalBytes
             val free = stats.availableBytes
@@ -44,7 +47,7 @@ class StorageWidget : AppWidgetProvider() {
             val prefs = context.getSharedPreferences("widget", Context.MODE_PRIVATE)
             val accent = prefs.getInt("accent", Color.rgb(215, 243, 91))
             val opacity = prefs.getInt("opacity", 92).coerceIn(0, 100)
-            val views = RemoteViews(context.packageName, R.layout.widget_storage)
+            val views = RemoteViews(context.packageName, if (compact) R.layout.widget_storage_compact else R.layout.widget_storage)
             val bg = Bitmap.createBitmap(500, 230, Bitmap.Config.ARGB_8888)
             Canvas(bg).drawRoundRect(0f, 0f, 500f, 230f, 34f, 34f,
                 Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -53,14 +56,14 @@ class StorageWidget : AppWidgetProvider() {
             views.setImageViewBitmap(R.id.background, bg)
             views.setImageViewBitmap(R.id.dot_percentage,
                 DotMatrix.render(String.format(Locale.US, "%.1f%%", fraction * 100), accent))
-            views.setTextViewText(R.id.free, format(free))
+            views.setTextViewText(R.id.free, if (compact) "${format(free)} FREE" else format(free))
             views.setTextViewText(R.id.used, "${format(used)} used")
             views.setTextViewText(R.id.total, "${format(total)} total")
             views.setTextColor(R.id.free, accent)
             views.setProgressBar(R.id.bar, 1000, (fraction * 1000).toInt(), false)
             views.setColorStateList(R.id.bar, "setProgressTintList", ColorStateList.valueOf(accent))
-            val refresh = PendingIntent.getBroadcast(context, 0,
-                Intent(context, StorageWidget::class.java).setAction(ACTION_REFRESH),
+            val refresh = PendingIntent.getBroadcast(context, if (compact) 1 else 0,
+                Intent(context, if (compact) StorageCompactWidget::class.java else StorageWidget::class.java).setAction(ACTION_REFRESH),
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
             views.setOnClickPendingIntent(R.id.refresh, refresh)
             val settings = PendingIntent.getActivity(context, 0,
