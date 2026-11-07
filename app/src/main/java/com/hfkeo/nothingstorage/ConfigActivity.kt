@@ -23,7 +23,7 @@ import android.widget.Toast
 import java.util.Locale
 
 class ConfigActivity : Activity() {
-    private val background = Color.rgb(16, 17, 19)
+    private val screenBackgroundColor = Color.rgb(16, 17, 19)
     private val surface = Color.rgb(35, 36, 39)
     private val muted = Color.rgb(164, 166, 171)
     private val palette = listOf(
@@ -56,10 +56,10 @@ class ConfigActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        window.statusBarColor = background
-        window.navigationBarColor = background
+        window.statusBarColor = screenBackgroundColor
+        window.navigationBarColor = screenBackgroundColor
         window.decorView.systemUiVisibility = 0
-        val scroll = ScrollView(this).apply { setBackgroundColor(background); isFillViewport = true }
+        val scroll = ScrollView(this).apply { setBackgroundColor(screenBackgroundColor); isFillViewport = true }
         val root = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(dp(22), dp(24), dp(22), dp(32))
