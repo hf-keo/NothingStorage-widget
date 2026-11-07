@@ -1,0 +1,13 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent">
+<ImageView android:id="@+id/background" android:layout_width="match_parent" android:layout_height="match_parent" android:scaleType="fitXY"/>
+<LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:padding="12dp">
+<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical">
+<TextView android:id="@+id/title" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="●  S T O R A G E" android:textColor="#EEEEEE" android:textSize="10sp"/>
+<TextView android:id="@+id/refresh" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="↻" android:textColor="#EEEEEE" android:textSize="19sp"/>
+</LinearLayout>
+<ImageView android:id="@+id/dot_percentage" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:layout_marginTop="8dp" android:layout_marginBottom="7dp" android:scaleType="fitCenter"/>
+<ProgressBar android:id="@+id/bar" style="?android:attr/progressBarStyleHorizontal" android:layout_width="match_parent" android:layout_height="7dp" android:max="1000" android:progressBackgroundTint="#33353B"/>
+<TextView android:id="@+id/free" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="9dp" android:textColor="#D7F35B" android:textSize="13sp" android:textStyle="bold"/>
+<TextView android:id="@+id/used" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:textColor="#AAAAAA" android:textSize="10sp"/>
+<TextView android:id="@+id/total" android:layout_width="match_parent" android:layout_height="wrap_content" android:visibility="gone"/>
+</LinearLayout></FrameLayout>
