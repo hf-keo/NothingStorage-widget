@@ -3,6 +3,7 @@ package com.hfkeo.nothingstorage
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
+import android.os.Bundle
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -19,6 +20,10 @@ import java.util.Locale
 class StorageWidget : AppWidgetProvider() {
     override fun onUpdate(context: Context, manager: AppWidgetManager, ids: IntArray) {
         ids.forEach { update(context, manager, it) }
+    }
+    override fun onAppWidgetOptionsChanged(context: Context, manager: AppWidgetManager, id: Int, options: Bundle) {
+        super.onAppWidgetOptionsChanged(context, manager, id, options)
+        update(context, manager, id)
     }
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
@@ -39,6 +44,9 @@ class StorageWidget : AppWidgetProvider() {
             String.format(Locale.getDefault(), "%.1f GB", bytes / 1_000_000_000.0)
 
         fun update(context: Context, manager: AppWidgetManager, id: Int, compact: Boolean = false) {
+            val options = manager.getAppWidgetOptions(id)
+            val minWidth = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH, if (compact) 110 else 250)
+            val isCompactLayout = minWidth < 220
             val stats = StatFs(Environment.getDataDirectory().absolutePath)
             val total = stats.totalBytes
             val free = stats.availableBytes
@@ -47,7 +55,7 @@ class StorageWidget : AppWidgetProvider() {
             val prefs = context.getSharedPreferences("widget", Context.MODE_PRIVATE)
             val accent = prefs.getInt("accent", Color.rgb(215, 243, 91))
             val opacity = prefs.getInt("opacity", 92).coerceIn(0, 100)
-            val views = RemoteViews(context.packageName, if (compact) R.layout.widget_storage_compact else R.layout.widget_storage)
+            val views = RemoteViews(context.packageName, if (isCompactLayout) R.layout.widget_storage_compact else R.layout.widget_storage)
             val bg = Bitmap.createBitmap(500, 230, Bitmap.Config.ARGB_8888)
             Canvas(bg).drawRoundRect(0f, 0f, 500f, 230f, 34f, 34f,
                 Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -56,7 +64,7 @@ class StorageWidget : AppWidgetProvider() {
             views.setImageViewBitmap(R.id.background, bg)
             views.setImageViewBitmap(R.id.dot_percentage,
                 DotMatrix.render(String.format(Locale.US, "%.1f%%", fraction * 100), accent))
-            views.setTextViewText(R.id.free, if (compact) "${format(free)} FREE" else format(free))
+            views.setTextViewText(R.id.free, if (isCompactLayout) "${format(free)} FREE" else format(free))
             views.setTextViewText(R.id.used, "${format(used)} used")
             views.setTextViewText(R.id.total, "${format(total)} total")
             views.setTextColor(R.id.free, accent)
